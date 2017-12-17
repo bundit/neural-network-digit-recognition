@@ -15,6 +15,7 @@ Matrix<T> operator*(Matrix<T> a, Matrix<T> b) {
 		//problem with matrix sizes cannot do multiplication
 		//error class to be added later
 		cout << "bad matrix dimensions" << endl;
+		cout << "size of m1 = " << a[0].size() << " size of m2 = " << b.size() << endl;
  		Matrix<T> m;
 		return m;
 	}
@@ -92,43 +93,4 @@ void test() {
 }
 
 
-
-int main()
-{	
-	//X = W * I
-	/*
-	Matrix<double> weights;
-	weights.push_back({0.9, 0.3, 0.4});
-	weights.push_back({0.2, 0.8, 0.2});
-	weights.push_back({0.1, 0.5, 0.6});
-
-	//cout << "length is " << m.size() << endl;
-	//cout << "length[] is " << m[0].size() << endl;
-	cout << "weights " << endl;
-	MM::printMatrix(weights);
-	cout << endl;
-
-	Matrix<double> inputs;
-	inputs.push_back({ 0.9, 0.1, 0.8 });
-
-
-	cout << "inputs" << endl;
-	MM::printMatrix(inputs);
-	cout << endl;
-
-	Matrix<double> X = weights*MM::transpose(inputs);
-	cout << "X = W * I" << endl;
-	MM::printMatrix(X);
-	cout << endl;
-	*/
-	/////////
-
-	Matrix<double> inputlist;
-	inputlist.push_back({ 1, 2, 3 });
-	//NetLayer l = 
-	NetLayer l(5, 2);
-
-	cout << "ended" << endl;
-	return 0;
-}
 

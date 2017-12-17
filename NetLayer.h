@@ -4,10 +4,9 @@
 
 //template<typename T>
 //using Matrix = vector<vector<T>>;
-using namespace std;
+//using namespace std;
 
 //Layer can be input layer, hidden, or output layer
-template<typename T>
 class NetLayer
 {
 private:
@@ -15,9 +14,9 @@ private:
 	int numInputs;
 	int numOutputs;
 
-	vector<T> inputs;
-	Matrix<T> weights;
-	vector<T> outputs;
+	Matrix<double> inputs;
+	Matrix<double> weights;
+	Matrix<double> outputs;
 
 	void giveRandomWeights();
 
@@ -25,9 +24,13 @@ public:
 	//constructors
 	NetLayer() {}
 	~NetLayer() {}
-	NetLayer(int iInput, int iOutput, vector<T> inputList);
+	NetLayer(int iInput, int iOutput);
 
 	//functions
-	void computeOutput();
+	void setInput(Matrix<double>);
+	void setWeights(Matrix<double>);
+	double sigmoid(double x);
+	void activation(Matrix<double> col);
+	Matrix<double> computeOutput();
 
 };
