@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "MatrixManipulation.h"
+#include "NetLayer.h"
 #include <vector>
 #include <iostream>
 
@@ -33,8 +34,9 @@ Matrix<T> operator*(Matrix<T> a, Matrix<T> b) {
 	return result;
 }
 
+
 template<typename T>
-static Matrix<T> transpose(Matrix<T> m) {
+static Matrix<T> MM::transpose(Matrix<T> m) {
 	Matrix<T> trans;
 
 	for (size_t i = 0; i < m[0].size(); i++) {
@@ -47,7 +49,7 @@ static Matrix<T> transpose(Matrix<T> m) {
 }
 
 template<typename T>
-void printMatrix(Matrix<T> m) {
+static void MM::printMatrix(Matrix<T> m) {
 	for (size_t i = 0; i < m.size(); i++) {
 		for (size_t j = 0; j < m[0].size(); j++) {
 			cout << m[i][j] << " ";
@@ -55,33 +57,78 @@ void printMatrix(Matrix<T> m) {
 		cout << endl;
 	}
 }
+template<typename T>
+static void MM::printVector(vector<T> m) {
+	for (size_t i = 0; i < m.size(); i++) {
+		cout << m[i] << " ";
+	}
+	cout << endl;
+}
+
+void test() {
+	std::cout << std::endl;
+
+	Matrix<double> matrix_a = { { 1, 2, 3 },{ 4, 5, 6 } };
+	Matrix<double> matrix_b = { { 7, 8 },{ 9, 10 },{ 11, 12 } };
+	std::vector<double> v = {1,2,3};
+	std::cout << "Matrix a: " << std::endl;
+	MM::printMatrix(matrix_a);
+	std::cout << "Matrix b: " << std::endl;
+	MM::printMatrix(matrix_b);
+
+	//check transpose
+	std::cout << "checking transpose of a (should have 2 columns, 3 rows): " << std::endl;
+	Matrix<double> transposed = MM::transpose(matrix_a);
+	MM::printMatrix(transposed);
+	std::cout << "checking transpose of b (should have 3 columns, 2 rows): " << std::endl;
+	MM::printMatrix(MM::transpose(matrix_b));
+
+	//matrix_a * v;
+
+	//check dot product overload
+	std::cout << "checking dot product overload: " << std::endl;
+	Matrix<double> overl = matrix_a * matrix_b;
+	MM::printMatrix(overl);
+}
+
+
 
 int main()
 {	
 	//X = W * I
+	/*
 	Matrix<double> weights;
 	weights.push_back({0.9, 0.3, 0.4});
 	weights.push_back({0.2, 0.8, 0.2});
 	weights.push_back({0.1, 0.5, 0.6});
 
-
 	//cout << "length is " << m.size() << endl;
 	//cout << "length[] is " << m[0].size() << endl;
 	cout << "weights " << endl;
-	printMatrix(weights);
+	MM::printMatrix(weights);
 	cout << endl;
 
 	Matrix<double> inputs;
-	inputs.push_back({0.9, 0.1, 0.8});
-	//inputs.push_back({ 7,8 });
+	inputs.push_back({ 0.9, 0.1, 0.8 });
+
+
 	cout << "inputs" << endl;
-	printMatrix(inputs);
+	MM::printMatrix(inputs);
 	cout << endl;
 
-	Matrix<double> X = weights*transpose(inputs);
+	Matrix<double> X = weights*MM::transpose(inputs);
 	cout << "X = W * I" << endl;
-	printMatrix(X);
+	MM::printMatrix(X);
+	cout << endl;
+	*/
+	/////////
+
+	Matrix<double> inputlist;
+	inputlist.push_back({ 1, 2, 3 });
+	//NetLayer l = 
+	NetLayer l(5, 2);
+
+	cout << "ended" << endl;
 	return 0;
 }
 
- 

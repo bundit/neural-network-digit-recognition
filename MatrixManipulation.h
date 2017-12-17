@@ -1,17 +1,22 @@
 #pragma once
 #include <vector>
 
-using namespace std;
-
 template<typename T>
-using Matrix = vector<vector<T>>;
+using Matrix = std::vector<std::vector<T>>;
 
-class MatrixManipulation
-{
+class MM {
 public:
 	template<typename T>
-	Matrix<T> operator*(Matrix<T>);
+	static void printMatrix(Matrix<T>);
 
 	template<typename T>
-	Matrix<T> transpose(Matrix<T>);
+	static void printVector(std::vector<T>);
+
+	template<typename T>
+	static Matrix<T> transpose(Matrix<T> m);
+
 };
+
+template<typename T>
+Matrix<T> operator*(Matrix<T>, Matrix<T>);
+
