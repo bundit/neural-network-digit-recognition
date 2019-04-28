@@ -6,18 +6,22 @@
 //using Matrix = vector<vector<T>>;
 //using namespace std;
 
-//Layer can be input layer, hidden, or output layer
+//NetLayer defines a construct of input layer, weights, and output nodes
+//We use two, one for input to hidden then another from hidden to output
 class NetLayer
 {
 private:
-
-	int numInputs;
+	//number of input and output
+	int numInputs; 
 	int numOutputs;
 
-	Matrix<double> inputs;
+	//Matrices for holding inputs, weights and output
+	Matrix<double> inputs; 
 	Matrix<double> weights;
-	Matrix<double> outputs;
-
+	Matrix<double> outputs; 
+	//Matrice holding output before applying sigmoid
+	Matrix<double> beforeSig;
+	
 	void giveRandomWeights();
 
 public:
@@ -32,5 +36,11 @@ public:
 	double sigmoid(double x);
 	void activation(Matrix<double> col);
 	Matrix<double> computeOutput();
+
+	//Getters
+	Matrix<double> getInputs();
+	Matrix<double> getWeights();
+	Matrix<double> getOutput();
+	Matrix<double> getOriginalOutput();
 
 };

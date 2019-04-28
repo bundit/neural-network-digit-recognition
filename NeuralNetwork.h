@@ -8,20 +8,27 @@
 class NeuralNetwork
 {
 private:
-	NetLayer inputToHidden;
-	NetLayer hiddenToOutput;
+	//Each connecting layer
+	//NetLayer inputToHidden;
+	//NetLayer hiddenToOutput;
+	//learning rate
 	double lRate;
 
 public:
 	//Constructors
-	NeuralNetwork() {}
-	~NeuralNetwork() {}
+	NetLayer inputToHidden;
+	NetLayer hiddenToOutput;
+
+	NeuralNetwork() {} //empty
+	~NeuralNetwork() {} 
 	NeuralNetwork(int numInput, int numHidden, int numOutput, double learningRate);
-	//main functions
-	void train(std::vector<double>);
+
+	//functions
+	void train(double answer, std::vector<double>);
 	Matrix<double> query(std::vector<double>);
-	//sub routines
-	Matrix<double> sigmoid(Matrix<double> hidden);
-	void backpropogate();
+
+	void backpropagation(double, Matrix<double> tOut);
+	void adjustWeights(Matrix<double> oError, Matrix<double> hError);
+	int test(int ans, std::vector<double>);
 
 };

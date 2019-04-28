@@ -15,8 +15,13 @@ public:
 	template<typename T>
 	static Matrix<T> transpose(Matrix<T> m);
 
+	template<typename T>
+	static std::vector<T> colVecToVec(Matrix<T> m);
 };
 
 template<typename T>
 Matrix<T> operator*(Matrix<T>, Matrix<T>);
+
+template<typename T>
+Matrix<T> operator-(Matrix<T>, Matrix<T>);
 
