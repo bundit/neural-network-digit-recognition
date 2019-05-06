@@ -1,30 +1,33 @@
-// MatrixManipulation.cpp : Defines the entry point for the console application.
-//
+//\/\/\/\/\/\/\/\/\/\/\/\/\/\//
+//                           //
+//  MatrixManipulation.cpp   //
+//                           //
+//\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 
-#include "stdafx.h"
 #include "MatrixManipulation.h"
-#include "NetLayer.h"
+
+// std library
 #include <vector>
 #include <iostream>
 
-using namespace std;
-
-//Error throwing class for matrix dimension errors with dot products
+// Dimension Error for matrix manipulation functions
 class MatrixDimensionError : public std::exception {
 public:
 	const char * what() const throw() {
-		return "Error with matrices dimensions";
+		return "Error - Invalid matrix dimensions";
 	}
 };
-//
-//Operator overloader for *
-//Implements dot product of two matrices
+
+// Operator overloader for *
+// Matrix by matrix multiplication
+// Implements dot product of two matrices
 template<typename T> 
 Matrix<T> operator*(Matrix<T> a, Matrix<T> b) {
 	if (a[0].size() != b.size()) { //throw error if dimensions not compatible
 		MatrixDimensionError e;
-		throw e;
+        throw e;
 	}
+    
 	Matrix<T> result;
 	
 	//Standard matrix multiplication algorithm
@@ -41,8 +44,25 @@ Matrix<T> operator*(Matrix<T> a, Matrix<T> b) {
 	return result;
 }
 
-//Operator overloader for -
-//Impplements subtraction of two matrices
+// Operator overloader for *
+// Scalar-Matrix multiplication
+// Returns a matrix with each index multiplied by the scalar a
+template<typename T>
+Matrix<T> operator*(double a, Matrix<T> b) {
+    Matrix<T> result;
+    
+    for (size_t i = 0; i < b.size(); i++) {
+        result.push_back({});
+        for (size_t j = 0; j < b[0].size(); j++) {
+            result[i].push_back(a * b[i][j]);
+        }
+    }
+    return result;
+}
+
+// Operator overloader for -
+// Matrix by matrix subtration
+// Implements subtraction of two matrices where each respective index of matrix a minus matrix b
 template<typename T>
 Matrix<T> operator-(Matrix<T> a, Matrix<T> b) {
 	if (a.size() != b.size() || a[0].size() != b[0].size()) {
@@ -52,16 +72,16 @@ Matrix<T> operator-(Matrix<T> a, Matrix<T> b) {
 	Matrix<double> r;
 	for (size_t i = 0; i < a.size(); i++) {
 		r.push_back({});
-		for (size_t j = 0; j < a[0].size(); j++) {
+		for (size_t j = 0; j < a[i].size(); j++) {
 			r[i].push_back(a[i][j] - b[i][j]);
 		}
 	}
 	return r;
 }
 
-//Generate the transpose of a given matrix
+// Generate the transpose of a given matrix
 template<typename T>
-static Matrix<T> MM::transpose(Matrix<T> m) {
+Matrix<T> MM::transpose(Matrix<T> m) {
 	Matrix<T> trans;
 
 	for (size_t i = 0; i < m[0].size(); i++) {
@@ -73,64 +93,63 @@ static Matrix<T> MM::transpose(Matrix<T> m) {
 	return trans;
 }
 
-//Generates a (single row) vector from a column vector in matrix data type
+// Print the matrix m
 template<typename T>
-static vector<T> MM::colVecToVec(Matrix<T> m) {
-	
-	vector<double> vec;
-	for (size_t i = 0; i < m.size(); i++) {
-		vec.push_back(m[i][0]);
-	}
-
-	return vec;
-}
-
-//Print the matrix m
-template<typename T>
-static void MM::printMatrix(Matrix<T> m) {
+void MM::printMatrix(Matrix<T> m) {
 	for (size_t i = 0; i < m.size(); i++) {
 		for (size_t j = 0; j < m[0].size(); j++) {
-			cout << m[i][j] << " ";
+            std::cout << m[i][j] << " ";
 		}
-		cout << endl;
+        std::cout << std::endl;
 	}
 }
 
-//Print the vector v
+// Print the vector v
 template<typename T>
-static void MM::printVector(vector<T> v) {
+void MM::printVector(std::vector<T> v) {
 	for (size_t i = 0; i < v.size(); i++) {
-		cout << v[i] << " ";
+        std::cout << v[i] << " ";
 	}
-	cout << endl;
+    std::cout << std::endl;
 }
 
-//Test function to solve linker errors
-void test() {
 
+// Testing Matrix Multiplication functions
+void testMatrixManipulations() {
+    using namespace std;
+    
 	Matrix<double> a{ {1,2,3},{4,5,6},{7,8,9} };
 	Matrix<double> b{ {1,1,1} };
 	vector<double> v{ 1,2,3 };
 	Matrix<double> t;
+    Matrix<double> sub1{ {-1,-2,-3},{-4,-5,-6},{-7,-8,-9} };
 
 	cout << "Printing matrix a: " << endl;
 	MM::printMatrix(a);
+    cout << endl << "Printing matrix b: " << endl;
+    MM::printMatrix(b);
+    
 	cout << endl << "Printing vector v: " << endl;
 	MM::printVector(v);
+    
 	cout << endl << "Transposing matrix b: " << endl;
 	t = MM::transpose(b);
 	MM::printMatrix(t);
-	cout << endl << "Converting column bt to vector: " << endl;
-	MM::printVector(MM::colVecToVec(t));
+    
 	cout << endl << "Dot product on matrix a and b: " << endl;
-	MM::printMatrix(a*b);
-	MM::printMatrix(a - a);
+    MM::printMatrix(a*MM::transpose(b));
+    
+    cout << endl << "Subtration on matrix a and sub1" << endl;
+	MM::printMatrix(a - sub1);
+    
+    cout << endl << "Equality on matrix a and a" << endl;
+    cout << (a==a) << endl;
+    
+    int cons = 2;
+    cout << "Constant * Matrix a" << endl;
+    MM::printMatrix(cons*a);
 
-	//Matrix<string> s{ {} };
-	//vector<string> ss{};
-	//MM::printMatrix(s);
-	//MM::printVector(ss);
 }
-
-
-
+//int main() {
+//    testMatrixManipulations();
+//}
