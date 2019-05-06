@@ -1,64 +1,56 @@
-#include "stdafx.h"
+//\/\/\/\/\/\/\/\/\/\/\/\/\/\//
+//                           //
+//     NeuralNetwork.cpp     //
+//                           //
+//\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 #include "NeuralNetwork.h"
 #define NUM_DIGITS 10
-//	Private variables for reference
-//	NetLayer inputToHidden;
-//	NetLayer hiddenToOutput;
-//	double lRate;
 
-using namespace std;
-//constructors
+//\/\/\/\/\/\/\/\/\/\/\/\/\/\//
+//	Private Variables        //
+//\/\/\/\/\/\/\/\/\/\/\/\/\/\//
+//	NetLayer inputToHidden;  //
+//	NetLayer hiddenToOutput; //
+//	double lRate;            //
+//\/\/\/\/\/\/\/\/\/\/\/\/\/\//
+
+// Neural Network Constructor
+// Defines a 3-layer neural network
+// Defined by number of input nodes, hidden nodes, and output nodes
+// Output usually defined as 10 nodes for digit recognition (0 - 9)
 NeuralNetwork::NeuralNetwork(int numInput, int numHidden, int numOutput, double learningRate) {
 	this->inputToHidden = NetLayer(numInput, numHidden);
 	this->hiddenToOutput = NetLayer(numHidden, numOutput);
 	this->lRate = learningRate;
 }
 
-Matrix<double> NeuralNetwork::query(std::vector<double> queryInput) {
-	
-	Matrix<double> qi; //create matrix out of input vector
-	qi.push_back(queryInput);
-
-	Matrix<double> outHidden, outFinal;
-
-	//connect the layers and run the inputs through to create output
-	this->inputToHidden.setInput(MM::transpose(qi));
-	outHidden = this->inputToHidden.computeOutput();
-	this->hiddenToOutput.setInput(outHidden);
-	outFinal = this->hiddenToOutput.computeOutput();
-
-	return outFinal;
+//
+void NeuralNetwork::query(std::vector<double> queryInput) {
+	// Set the input to column vector
+    Matrix<double> qi;
+    qi.push_back(queryInput);
+    qi = MM::transpose(qi);
+    
+    this->inputToHidden.setInput(qi);
+    this->inputToHidden.computeOutput();
+    this->hiddenToOutput.setInput(inputToHidden.getOutput());
+    this->hiddenToOutput.computeOutput();
 }
 
 //train the network for one input
-void NeuralNetwork::train(double answer, std::vector<double> trainInput) {
+void NeuralNetwork::train(int answer, std::vector<double> trainInput) {
 	//calculate the output
-	Matrix<double> trainOutput = query(trainInput);
-	//cout << "tout" << endl;
-	//MM::printMatrix(trainOutput);
-	//cout << endl << endl;
+    query(trainInput);
 
 	//backpropagate errors and then within adjust weights
-	//cout << "before weight changes" << endl;
-	//MM::printMatrix(this->hiddenToOutput.getWeights());
-	backpropagation(answer, trainOutput);
-	//cout << "after weight changes" << endl;
-	//ZXMM::printMatrix(this->hiddenToOutput.getWeights());
-
-	
+	this->backpropagation(answer, this->hiddenToOutput.getOutput());
 }
 
-//Back propogation to generate error rate for output layer and hidden layer
-void NeuralNetwork::backpropagation(double answer, Matrix<double> tOut) {
-	//calculate the error for output layer
-	//cout << "answer = " << answer << endl << endl;
-
-	//cout << "train output" << endl;
-	//MM::printMatrix(tOut);
-	//cout << endl;
-
+//Back propogate errors from the output layer to the hidden layer
+void NeuralNetwork::backpropagation(int answer, Matrix<double> tOut) {
+	// Calculate the error for output layer
 	Matrix<double> outputError;
-	for (int i = 0; i < NUM_DIGITS; i++) { //calculate error rate for each digit
+	for (size_t i = 0; i < tOut.size(); i++) {
 		if (i == answer) {
 			outputError.push_back({ 0.99 - tOut[i][0] });
 		}
@@ -66,94 +58,60 @@ void NeuralNetwork::backpropagation(double answer, Matrix<double> tOut) {
 			outputError.push_back({ 0.01 - tOut[i][0] });
 		}
 	}
-	
-	//cout << "output error" << endl;
-	//MM::printMatrix(outputError);
-
-	//calculate the error for hidden layer
-	Matrix<double> errorsHidden =  MM::transpose(this->hiddenToOutput.getWeights()) * outputError;
-	//cout << "here";
+    
+	// Calculate the error for hidden layer
+	Matrix<double> hiddenError =  MM::transpose(this->hiddenToOutput.getWeights()) * outputError;
+    
 	//adjust the weights using the error calculated
-	adjustWeights(outputError, errorsHidden);
+	this->adjustWeights(outputError, hiddenError);
 }
 
-//adjust the weights according to the output error and the hidden layer error
+// Adjust the weights according to the output error and the hidden layer error
 void NeuralNetwork::adjustWeights(Matrix<double> oError, Matrix<double> hError) {
-	Matrix<double> deltaW; //hidden to output
-	Matrix<double> deltaW2; //input to hidden
+    Matrix<double> temph2o;
+    Matrix<double> tempi2h;
 
-	Matrix<double> temp;
-	Matrix<double> temp2;
+    Matrix<double> h2oOutput = this->hiddenToOutput.getOutput();
+    Matrix<double> i2hOutput = this->inputToHidden.getOutput();
 
-	//cout << "oerror" << endl;
-	//MM::printMatrix(oError);
-	//cout << endl << "herror" << endl;
-	//MM::printMatrix(hError);
-	//cout << endl;
+    for (size_t i = 0; i < oError.size(); i++) {
+        double si = h2oOutput[i][0];
+        temph2o.push_back({ -1 * (this->lRate) * oError[i][0] * (si * ((double)1 - si)) });
+    }
+    for (size_t i = 0; i < hError.size(); i++) {
+        double si = i2hOutput[i][0];
+        tempi2h.push_back({ -1 * (this->lRate) * hError[i][0] * (si * ((double)1 - si)) });
+    }
+    Matrix<double> deltaWh2o; //hidden to output
+    Matrix<double> deltaWi2h; //input to hidden
 
-	for (size_t i = 0; i < oError.size(); i++) {
-		double currentOut = this->hiddenToOutput.getOutput()[i][0];
-		temp.push_back({-1*(this->lRate) * oError[i][0] * currentOut * (1 - currentOut)});
-		//cout << "before " << oError[i][0] << " after " << -1 * (this->lRate) * oError[i][0] * currentOut * (1 - currentOut) << endl;
-	}
-	for (size_t i = 0; i < hError.size(); i++) {
-		double currentOut2 = this->inputToHidden.getOutput()[i][0];
-		temp2.push_back({-1*(this->lRate) * hError[i][0] * currentOut2 * (1 - currentOut2)});
-	}
+    deltaWh2o = temph2o * MM::transpose(this->hiddenToOutput.getInputs());
+    deltaWi2h = tempi2h * MM::transpose(this->inputToHidden.getInputs());
 
-	//deltaW = temp * MM::transpose(this->inputToHidden.getOriginalOutput());
-	deltaW = temp * MM::transpose(this->hiddenToOutput.getInputs());
-	deltaW2 = temp2 * MM::transpose(this->inputToHidden.getInputs());
-
-	this->hiddenToOutput.setWeights(this->hiddenToOutput.getWeights() - deltaW);
-	this->inputToHidden.setWeights(this->inputToHidden.getWeights() - deltaW2);
+    this->hiddenToOutput.setWeights(this->hiddenToOutput.getWeights() - deltaWh2o);
+    this->inputToHidden.setWeights(this->inputToHidden.getWeights() - deltaWi2h);
 }
 
 //returns 1 if the output is correct
 //returns 0 if the output is incorrect
-int NeuralNetwork::test(int ans, std::vector<double> input) {
-	Matrix<double> results = query(input);
-	//cout << "target: " << ans << endl;
-	//MM::printMatrix(results);
-	//cout << endl;
-	int index = 0;
-	double max = 0;
+bool NeuralNetwork::test(int ans, std::vector<double> input) {
+    // Query the neural network
+    query(input);
+    Matrix<double> results = this->hiddenToOutput.getOutput();
+
+    // Find the answer output by neural net
+    double max = results[0][0];
+	size_t answerIndex = 0;
 	for (size_t i = 0; i < results.size(); i++) {
 		if (results[i][0] > max) {
-			index = i;
+			answerIndex = i;
 			max = results[i][0];
 		}
 	}
-	if (index == ans) return 1;
-	//cout << ans << " ans -- index  " << index << endl;
-	return 0;
+    
+    // Compare the answer to the answer given
+	if (answerIndex == ans)
+        return true;
+    
+	return false;
 }
-/*
-int main() {
-	//NeuralNetwork::NeuralNetwork(int numInput, int numHidden, int numOutput, double learningRate) {
-	NeuralNetwork nn(2,2,2,1);
-
-	Matrix<double> input;
-	input.push_back({ 0.9 });
-	input.push_back({ 0.1 });
-	input.push_back({ 0.8 });
-	//input.push_back({ { { 0.9 }, { 0.1 }, { 0.8 } } });
-	nn.inputToHidden.setInput(input);
-
-	Matrix<double> weights;
-	weights.push_back({ 0.9, 0.3, 0.4 });
-	weights.push_back({ 0.2, 0.8, 0.2 });
-	weights.push_back({ 0.1, 0.5, 0.6 });
-	nn.inputToHidden.setWeights(weights);
-
-	Matrix<double> weights2;
-	weights2.push_back({ 0.3, 0.7, 0.5 });
-	weights2.push_back({ 0.6, 0.5, 0.2 });
-	weights2.push_back({ 0.8, 0.1, 0.9 });
-	nn.hiddenToOutput.setWeights(weights2);
-	
-	std::cout << "output matrix: " << endl;
-	MM::printMatrix(nn.query({ 0.9,0.1,0.8 }));
-}
-
-*/
