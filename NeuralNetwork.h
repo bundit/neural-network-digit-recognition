@@ -25,4 +25,8 @@ public:
     void train(int answer, std::vector<double>);
 	void backpropagation(int answer, Matrix<double> tOut);
 	void adjustWeights(Matrix<double> oError, Matrix<double> hError);
+    
+    // Serialization
+    void serialize(std::string file);
+    void deserialize(std::string file);
 };

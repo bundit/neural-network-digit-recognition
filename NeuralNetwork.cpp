@@ -3,8 +3,14 @@
 //     NeuralNetwork.cpp     //
 //                           //
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\//
-#include "NeuralNetwork.h"
 #define NUM_DIGITS 10
+#include "NeuralNetwork.h"
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
+//#include <filesystem>
 
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 //	Private Variables        //
@@ -24,7 +30,7 @@ NeuralNetwork::NeuralNetwork(int numInput, int numHidden, int numOutput, double 
 	this->lRate = learningRate;
 }
 
-//
+// Query
 void NeuralNetwork::query(std::vector<double> queryInput) {
 	// Set the input to column vector
     Matrix<double> qi;
@@ -37,7 +43,9 @@ void NeuralNetwork::query(std::vector<double> queryInput) {
     this->hiddenToOutput.computeOutput();
 }
 
-//train the network for one input
+// Train the network for one input
+// answer - the expected answer
+// trainInput - the 
 void NeuralNetwork::train(int answer, std::vector<double> trainInput) {
 	//calculate the output
     query(trainInput);
@@ -115,3 +123,80 @@ bool NeuralNetwork::test(int ans, std::vector<double> input) {
     
 	return false;
 }
+
+// Save the neural network's weight matrices to file
+void NeuralNetwork::serialize(std::string file) {
+    using namespace std;
+    
+    Matrix<double> i2h = this->inputToHidden.getWeights();
+    Matrix<double> h2o = this->hiddenToOutput.getWeights();
+    
+    ofstream fout;
+    fout.open(file);
+    
+    if (!fout.is_open()) {
+        cout << "Error opening file " << file << endl;
+    }
+    
+    for (int i = 0; i < i2h.size(); i++) {
+        for (int j = 0; j < i2h[0].size(); j++) {
+            fout << i2h[i][j] << " ";
+        }
+        fout << endl;
+    }
+    fout << endl;
+    
+    for (int i = 0; i < h2o.size(); i++) {
+        for (int j = 0; j < h2o[0].size(); j++) {
+            fout << h2o[i][j] << " ";
+        }
+        fout << endl;
+    }
+    
+    fout.close();
+}
+
+// Load neural network weights from file
+void NeuralNetwork::deserialize(std::string file) {
+    using namespace std;
+    
+    Matrix<double> i2h;
+    Matrix<double> h2o;
+    
+    string line;
+    ifstream fin (file);
+    
+    if (!fin.is_open()) {
+        cout << "Error opening file " << file << endl;
+    }
+    int row = 0;
+    while (getline(fin, line)) {
+        if (line.length() == 0) break;
+        string val;
+        stringstream s(line);
+        i2h.push_back({});
+        
+        
+        while (getline(s, val, ' ')) {
+            i2h[row].push_back(stod(val));
+        }
+        row++;
+    }
+    row = 0;
+    while (getline(fin, line)) {
+        string val;
+        stringstream s(line);
+        h2o.push_back({});
+        
+        
+        while (getline(s, val, ' ')) {
+            h2o[row].push_back(stod(val));
+        }
+        row++;
+    }
+    fin.close();
+    
+    this->inputToHidden.setWeights(i2h);
+    this->hiddenToOutput.setWeights(h2o);
+}
+
