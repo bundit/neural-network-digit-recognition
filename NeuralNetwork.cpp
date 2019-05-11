@@ -1,6 +1,7 @@
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 //                           //
 //     NeuralNetwork.cpp     //
+//  Author: Bundit Hongmanee //
 //                           //
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 #define NUM_DIGITS 10
@@ -9,8 +10,6 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-
-//#include <filesystem>
 
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 //	Private Variables        //
@@ -30,13 +29,16 @@ NeuralNetwork::NeuralNetwork(int numInput, int numHidden, int numOutput, double 
 	this->lRate = learningRate;
 }
 
-// Query
+// Query the neural network
+// queryInput - the vector of input to the neural net
+// Saves the output to this->hiddenToOut.output
 void NeuralNetwork::query(std::vector<double> queryInput) {
-	// Set the input to column vector
+	// Set the input to column vector - necessary in order to appropriately perform matrix multiplication
     Matrix<double> qi;
     qi.push_back(queryInput);
     qi = MM::transpose(qi);
     
+    // Feed forward through neural net
     this->inputToHidden.setInput(qi);
     this->inputToHidden.computeOutput();
     this->hiddenToOutput.setInput(inputToHidden.getOutput());
@@ -45,7 +47,7 @@ void NeuralNetwork::query(std::vector<double> queryInput) {
 
 // Train the network for one input
 // answer - the expected answer
-// trainInput - the 
+// trainInput - the vector of input to the neural network
 void NeuralNetwork::train(int answer, std::vector<double> trainInput) {
 	//calculate the output
     query(trainInput);
@@ -54,7 +56,8 @@ void NeuralNetwork::train(int answer, std::vector<double> trainInput) {
 	this->backpropagation(answer, this->hiddenToOutput.getOutput());
 }
 
-//Back propogate errors from the output layer to the hidden layer
+// Back propogate errors from the output layer to the hidden layer
+// Calculate errors to use to adjust the weight matrices
 void NeuralNetwork::backpropagation(int answer, Matrix<double> tOut) {
 	// Calculate the error for output layer
 	Matrix<double> outputError;
@@ -75,6 +78,8 @@ void NeuralNetwork::backpropagation(int answer, Matrix<double> tOut) {
 }
 
 // Adjust the weights according to the output error and the hidden layer error
+// oError - error column vector for output layer
+// hError - error column vector for hidden layer
 void NeuralNetwork::adjustWeights(Matrix<double> oError, Matrix<double> hError) {
     Matrix<double> temph2o;
     Matrix<double> tempi2h;
@@ -100,8 +105,9 @@ void NeuralNetwork::adjustWeights(Matrix<double> oError, Matrix<double> hError) 
     this->inputToHidden.setWeights(this->inputToHidden.getWeights() - deltaWi2h);
 }
 
-//returns 1 if the output is correct
-//returns 0 if the output is incorrect
+// Query an input and test it against the answer given
+// Returns 1 if the output is correct
+// Returns 0 if the output is incorrect
 bool NeuralNetwork::test(int ans, std::vector<double> input) {
     // Query the neural network
     query(input);
@@ -125,12 +131,15 @@ bool NeuralNetwork::test(int ans, std::vector<double> input) {
 }
 
 // Save the neural network's weight matrices to file
+// Only the weight matrices are needed to reproduce the same neural network
+// This method will completely overwrite an existing file
 void NeuralNetwork::serialize(std::string file) {
     using namespace std;
     
     Matrix<double> i2h = this->inputToHidden.getWeights();
     Matrix<double> h2o = this->hiddenToOutput.getWeights();
     
+    // Open file stream to write to
     ofstream fout;
     fout.open(file);
     
@@ -138,16 +147,21 @@ void NeuralNetwork::serialize(std::string file) {
         cout << "Error opening file " << file << endl;
     }
     
+    // Print input-hidden weight matrix first
     for (int i = 0; i < i2h.size(); i++) {
         for (int j = 0; j < i2h[0].size(); j++) {
+            // Print to file values separated by spaces
             fout << i2h[i][j] << " ";
         }
         fout << endl;
     }
+    // Print one empty line in between
     fout << endl;
     
+    // Print hidden-output weight matrix second
     for (int i = 0; i < h2o.size(); i++) {
         for (int j = 0; j < h2o[0].size(); j++) {
+            // Print to file values separated by spaces
             fout << h2o[i][j] << " ";
         }
         fout << endl;
@@ -157,6 +171,7 @@ void NeuralNetwork::serialize(std::string file) {
 }
 
 // Load neural network weights from file
+// The exact reverse operations as NeuralNetwork::serialize method
 void NeuralNetwork::deserialize(std::string file) {
     using namespace std;
     
@@ -187,7 +202,6 @@ void NeuralNetwork::deserialize(std::string file) {
         string val;
         stringstream s(line);
         h2o.push_back({});
-        
         
         while (getline(s, val, ' ')) {
             h2o[row].push_back(stod(val));
