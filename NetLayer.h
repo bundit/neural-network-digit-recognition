@@ -1,6 +1,5 @@
 #pragma once
 #include "MatrixManipulation.h"
-#include <vector>
 
 // NetLayer defines a construct of input layer, weights, and output nodes
 // We use two, one for input to hidden then another from hidden to output
@@ -26,7 +25,6 @@ public:
     ~NetLayer() {}
 
 	//functions
-	double sigmoid(double x);
 	void activation(Matrix<double> col);
 	Matrix<double> computeOutput();
     

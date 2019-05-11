@@ -1,6 +1,10 @@
+//\/\/\/\/\/\/\/\/\/\/\/\/\/\//
+//                           //
+//       NetLayer.cpp        //
+//                           //
+//\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 #include "NetLayer.h"
 #include "MatrixManipulation.h"
-// std library
 #include <random>
 #include <iostream>
 
@@ -26,23 +30,22 @@ NetLayer::NetLayer(int iInput, int iOutput) {
 Matrix<double> NetLayer::computeOutput() {
     // X = W * I
     this->outputs = this->weights * this->inputs;
-    
     // Apply sigmoid to output
     activation(this->outputs);
     
     return this->outputs;
 }
 
+// Compute the sigmoid function
+double sigmoid(double x) {
+    return 1 / (1 + std::exp(-x));
+}
+
 // Applies the sigmoid function to every output node of this->outputs
 void NetLayer::activation(Matrix<double> col) {
 	for (size_t i = 0; i < col.size(); i++) {
-        this->outputs[i][0] = NetLayer::sigmoid(col[i][0]);
+        this->outputs[i][0] = sigmoid(col[i][0]);
 	}
-}
-
-// Compute the sigmoid function
-double NetLayer::sigmoid(double x) {
-	return 1 / (1 + std::exp(-x));
 }
 
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\//
