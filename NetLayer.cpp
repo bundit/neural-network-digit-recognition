@@ -1,6 +1,7 @@
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 //                           //
 //       NetLayer.cpp        //
+//  Author: Bundit Hongmanee //
 //                           //
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 #include "NetLayer.h"
@@ -9,24 +10,27 @@
 #include <iostream>
 
 
-//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\//
-//  Private variables for reference  //
-//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\//
-//  int numInputs;                   //
-//  int numOutputs;                  //
-//  Matrix<T> inputs;                //
-//  Matrix<T> weights;               //
-//  Matrix<T> outputs;               //
-//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\//
+//\/\/\/\/\/\/\/\/\/\/\/\/\/\//
+//  Private variables        //
+//\/\/\/\/\/\/\/\/\/\/\/\/\/\//
+//  int numInputs;           //
+//  int numOutputs;          //
+//  Matrix<T> inputs;        //
+//  Matrix<T> weights;       //
+//  Matrix<T> outputs;       //
+//\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 
 // Constructor for initializing the Layer
+// iInput - number of input nodes
+// iOutput - number of output nodes
 NetLayer::NetLayer(int iInput, int iOutput) {
 	this->numInputs = iInput;
 	this->numOutputs = iOutput;
 	this->giveRandomWeights();
 }
 
-//Compute the matrix multiplication and apply the sigmoid function to the output
+// Compute the matrix multiplication and apply the sigmoid function to the output
+// The core function of a layer to feed forward input through the network
 Matrix<double> NetLayer::computeOutput() {
     // X = W * I
     this->outputs = this->weights * this->inputs;
@@ -37,6 +41,7 @@ Matrix<double> NetLayer::computeOutput() {
 }
 
 // Compute the sigmoid function
+// Standard sigmoid function
 double sigmoid(double x) {
     return 1 / (1 + std::exp(-x));
 }
@@ -47,10 +52,6 @@ void NetLayer::activation(Matrix<double> col) {
         this->outputs[i][0] = sigmoid(col[i][0]);
 	}
 }
-
-//\/\/\/\/\/\/\/\/\/\/\/\/\/\//
-//     Private functions     //
-//\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 
 // Generate and assign random weights for this layer
 // Given a range from -1/sqrt(numInput) to +1/sqrt(numInput)
@@ -74,16 +75,16 @@ void NetLayer::giveRandomWeights() {
 	}
 }
 
-//Set the input list to prepare for computing output
+// Set the input list to prepare for computing output
 void NetLayer::setInput(Matrix<double> inputList) {
 	this->inputs = inputList;
 }
-//Set your own weights, used for back propogation and adjusting weights
+// Set your own weights, used for back propogation and adjusting weights
 void NetLayer::setWeights(Matrix<double> s) {
 	this->weights = s;
 }
 
-//getters
+// Getters
 Matrix<double> NetLayer::getInputs() {
 	return this->inputs;
 }
@@ -94,6 +95,8 @@ Matrix<double> NetLayer::getOutput() {
 	return this->outputs;
 }
 
+
+// Testing method - not paramount to neural network functionality
 void testSingleLayer() {
     // Testing case 1
     /////////////////
