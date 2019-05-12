@@ -1,13 +1,11 @@
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 //                           //
 //  MatrixManipulation.cpp   //
+//  Author: Bundit Hongmanee //
 //                           //
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 
 #include "MatrixManipulation.h"
-
-// std library
-#include <vector>
 #include <iostream>
 
 // Dimension Error for matrix manipulation functions
