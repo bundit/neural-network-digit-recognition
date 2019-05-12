@@ -1,0 +1,5 @@
+# Don't track this folder 
+_build/
+
+# Don't track these files
+.DS_Store
