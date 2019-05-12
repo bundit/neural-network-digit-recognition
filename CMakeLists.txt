@@ -9,6 +9,5 @@ else()
 endif()
 
 set (CMAKE_CXX_STANDARD 11)
-
 project (neural-net)
-add_executable (neural-net-app main.cpp NeuralNetwork.cpp NetLayer.cpp MatrixManipulation.cpp)
+add_executable (neural-net-app app/main.cpp src/NeuralNetwork.cpp src/NetLayer.cpp src/MatrixManipulation.cpp)

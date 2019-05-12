@@ -5,7 +5,7 @@
 //                           //
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 
-#include "MatrixManipulation.h"
+#include "../include/MatrixManipulation.h"
 #include <iostream>
 
 // Dimension Error for matrix manipulation functions

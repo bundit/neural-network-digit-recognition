@@ -5,7 +5,7 @@
 //                           //
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 #define NUM_DIGITS 10
-#include "NeuralNetwork.h"
+#include "../include/NeuralNetwork.h"
 #include <string>
 #include <fstream>
 #include <iostream>

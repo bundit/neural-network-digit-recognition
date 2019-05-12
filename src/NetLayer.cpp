@@ -4,8 +4,8 @@
 //  Author: Bundit Hongmanee //
 //                           //
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\//
-#include "NetLayer.h"
-#include "MatrixManipulation.h"
+#include "../include/NetLayer.h"
+#include "../include/MatrixManipulation.h"
 #include <random>
 #include <iostream>
 
