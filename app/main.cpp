@@ -5,20 +5,23 @@
 //                             //
 //\/\/\/\/\/\/\/\/\/\/\/\/\/\/\//
 
+// Project headers
 #include "../include/MatrixManipulation.h"
 #include "../include/NetLayer.h"
 #include "../include/NeuralNetwork.h"
+// Std includes
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
 #include <unistd.h>
 
-using namespace std;
-
 // MNIST data files
-string TRAIN_DATA = "/Users/bundit/code/neural-net/neural-net/mnist_train.csv"; //Training data set
-string TEST_DATA = "/Users/bundit/code/neural-net/neural-net/mnist_test.csv";   //Testing data set
+std::string TRAIN_DATA = "../data/mnist/mnist_train.csv"; //Training data set
+std::string TEST_DATA = "../data/mnist/mnist_test.csv";   //Testing data set
+
+// Serialized folder
+std::string SERIALIZED_DATA = "../data/serializable/";
 
 // Neural Network parameters
 int INPUT_NODES = 28 * 28;  // For grayscale images of length 28 and width 28 pixels
@@ -29,18 +32,19 @@ double LEARNING_RATE = .2;  // Ratio used to prevent 'overstepping' in our weigh
 // Training and testing parameters
 // Set these to INT_MAX to train or test the whole set,
 // otherwise set to a smaller number to train or test only a specific amount
-int TRAINING_COUNT = INT_MAX;
-int TESTING_COUNT = INT_MAX;
+int TRAINING_COUNT = 60000;
+int TESTING_COUNT = 10000;
 
 // Testing function declarations
-void trainNetwork(string data);
-void testNetwork(string data);
+void trainNetwork(std::string data);
+void testNetwork(std::string data);
 void printResults(int count, int total);
+void displayProgress(int current, int total);
 
 NeuralNetwork n;
 
 int main (int argc, const char * argv[]) {
-    
+    using namespace std;
     string directory(argv[0]);
     // And we want to get rid of the program name `test`
     directory = directory.substr(0, directory.find_last_of("/"));
@@ -60,8 +64,9 @@ int main (int argc, const char * argv[]) {
     // Test the network
     cout << endl << "Testing 0.05x5" << endl;
     n = NeuralNetwork(INPUT_NODES, HIDDEN_NODES, OUTPUT_NODES, 0.05);
-    n.serialize("test.txt");
-    n.deserialize("serializable/784x100x10-0.05x4.txt");
+//    n.serialize("test.txt");
+    n.deserialize(SERIALIZED_DATA + "784x100x10-0.1.txt");
+    testNetwork(TEST_DATA);
 //    trainNetwork(TRAIN_DATA);
 //    n.serialize("/Users/bundit/code/neural-net/neural-net/serializable/784x100x10-0.05x5.txt");
 //    testNetwork(TEST_DATA);
@@ -88,7 +93,8 @@ int main (int argc, const char * argv[]) {
 
 
 // Reads from the file provided by 'data' and trains the neural network n
-void trainNetwork(string data) {
+void trainNetwork(std::string data) {
+    using namespace std;
     int trainCount = 0; //train counter
     // IO variables
     string line; //to hold each line
@@ -111,15 +117,17 @@ void trainNetwork(string data) {
         }
         
         n.train(ans, row);
+        displayProgress(trainCount, TRAINING_COUNT);
         trainCount++; //increment number of times trained
     }
     f.close();
 }
 
 // Reads from the file 'data' and
-void testNetwork(string data) {
+void testNetwork(std::string data) {
+    using namespace std;
     int correct = 0; //count of number of tests we've done
-    int numTest = 0; //number of tests to do
+    int testCount = 0; //number of tests to do
     
     // IO variables
     string line; //string to hold one line
@@ -129,7 +137,7 @@ void testNetwork(string data) {
         cout << "Error while opening file " << data << endl;
     }
     
-    while (getline(f, line) && numTest < TESTING_COUNT) { //read a line
+    while (getline(f, line) && testCount < TESTING_COUNT) { //read a line
         string val; //to hold one value at a time
         stringstream s (line);
         vector<double> row; //to hold one set of input
@@ -146,17 +154,25 @@ void testNetwork(string data) {
         if ( n.test(ans, row) ) {
              correct++;
         }
-        numTest++;
+        displayProgress(testCount, TESTING_COUNT);
+        testCount++;
     }
     f.close();
     
     // Print the results
-    printResults(correct, numTest);
+    printResults(correct, testCount);
 }
 
 //print the results given the count and total amount of inputs
 void printResults(int count, int total) {
+    using namespace std;
 	cout << "Total of " << total << " inputs tested." << endl;
 	cout << count << " verified correct." << endl;
 	cout << (double)count / total * 100 << "% accuracy." << endl;
+}
+
+void displayProgress(int current, int total) {
+    int percent = (double) current / total * 100.0;
+    std::cout << current << " of " << total << " completed | " << percent << "%\r";
+    std::cout.flush();
 }
