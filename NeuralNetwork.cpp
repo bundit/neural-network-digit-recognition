@@ -62,7 +62,7 @@ void NeuralNetwork::backpropagation(int answer, Matrix<double> tOut) {
 	// Calculate the error for output layer
 	Matrix<double> outputError;
 	for (size_t i = 0; i < tOut.size(); i++) {
-		if (i == answer) {
+		if (i == (size_t) answer) {
 			outputError.push_back({ 0.99 - tOut[i][0] });
 		}
 		else {
@@ -118,13 +118,13 @@ bool NeuralNetwork::test(int ans, std::vector<double> input) {
 	size_t answerIndex = 0;
 	for (size_t i = 0; i < results.size(); i++) {
 		if (results[i][0] > max) {
-			answerIndex = i;
+			answerIndex = (size_t) i;
 			max = results[i][0];
 		}
 	}
     
     // Compare the answer to the answer given
-	if (answerIndex == ans)
+	if (answerIndex == (size_t) ans)
         return true;
     
 	return false;
@@ -148,8 +148,8 @@ void NeuralNetwork::serialize(std::string file) {
     }
     
     // Print input-hidden weight matrix first
-    for (int i = 0; i < i2h.size(); i++) {
-        for (int j = 0; j < i2h[0].size(); j++) {
+    for (size_t i = 0; i < i2h.size(); i++) {
+        for (size_t j = 0; j < i2h[0].size(); j++) {
             // Print to file values separated by spaces
             fout << i2h[i][j] << " ";
         }
@@ -159,8 +159,8 @@ void NeuralNetwork::serialize(std::string file) {
     fout << endl;
     
     // Print hidden-output weight matrix second
-    for (int i = 0; i < h2o.size(); i++) {
-        for (int j = 0; j < h2o[0].size(); j++) {
+    for (size_t i = 0; i < h2o.size(); i++) {
+        for (size_t j = 0; j < h2o[0].size(); j++) {
             // Print to file values separated by spaces
             fout << h2o[i][j] << " ";
         }
