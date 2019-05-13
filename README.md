@@ -39,9 +39,9 @@ And finally install CMake with this:
 $ sudo apt-get -y install cmake
 ```
 ### Windows
-...to be done...
+For Windows you will need CygWin, get it [http://www.cygwin.com/install.html](here). When installing CygWin make sure you install these packages: `g++`, `gdb`, and `make`.
 
-Install CMake with the installer from [this page](https://cmake.org/download/).
+Lastly, install CMake with the installer from [this page](https://cmake.org/download/).
 
 ## Project Installation and Setup
 Clone the repository
