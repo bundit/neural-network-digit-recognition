@@ -15,19 +15,20 @@
 #include <string>
 #include <sstream>
 #include <unistd.h>
+#include <dirent.h>
 
 // MNIST data files
 std::string TRAIN_DATA = "../data/mnist/mnist_train.csv"; //Training data set
 std::string TEST_DATA = "../data/mnist/mnist_test.csv";   //Testing data set
 
 // Serialized folder
-std::string SERIALIZED_DATA = "../data/serializable/";
+std::string SERIALIZED_FOLDER = "../data/serializable/";
 
 // Neural Network parameters
 int INPUT_NODES = 28 * 28;  // For grayscale images of length 28 and width 28 pixels
-int HIDDEN_NODES = 100;     // Arbitrary number, usually a number between OUTPUT_NODES and INPUT_NODES is recommended
+//int HIDDEN_NODES = 100;     // Arbitrary number, usually a number between OUTPUT_NODES and INPUT_NODES is recommended
 int OUTPUT_NODES = 10;      // For digit recognition, 0-9 represents 10 different outputs possible
-double LEARNING_RATE = .2;  // Ratio used to prevent 'overstepping' in our weight adjustments
+//double LEARNING_RATE = .2;  // Ratio used to prevent 'overstepping' in our weight adjustments
 
 // Training and testing parameters
 // Set these to INT_MAX to train or test the whole set,
@@ -45,48 +46,80 @@ NeuralNetwork n;
 
 int main (int argc, const char * argv[]) {
     using namespace std;
-    string directory(argv[0]);
-    // And we want to get rid of the program name `test`
-    directory = directory.substr(0, directory.find_last_of("/"));
-    // Point the directory to the program directory
-    chdir(directory.c_str());
     
-    cout << "Current directory is: " << getcwd(NULL, 0) << endl;
-    // Print the arguments
-    cout << "Initialized neural network with: " << endl << INPUT_NODES << " input nodes, " << endl;
-    cout << HIDDEN_NODES << " hidden layer nodes, " << endl;
-    cout << OUTPUT_NODES << " output nodes, and " << endl;
-    cout << LEARNING_RATE << " learning rate..." << endl;
-//    cout << full_path;
-    n = NeuralNetwork(INPUT_NODES, HIDDEN_NODES, OUTPUT_NODES, LEARNING_RATE);
-    // Initialize the neural network
+    cout << endl << "Starting Convolutional Neural Network Program..." << endl;
+    char input;
     
-    // Test the network
-    cout << endl << "Testing 0.05x5" << endl;
-    n = NeuralNetwork(INPUT_NODES, HIDDEN_NODES, OUTPUT_NODES, 0.05);
-//    n.serialize("test.txt");
-    n.deserialize(SERIALIZED_DATA + "784x100x10-0.1.txt");
-    testNetwork(TEST_DATA);
-//    trainNetwork(TRAIN_DATA);
-//    n.serialize("/Users/bundit/code/neural-net/neural-net/serializable/784x100x10-0.05x5.txt");
-//    testNetwork(TEST_DATA);
-//
-//    cout << endl << "Testing 0.1x5" << endl;
-//    n = NeuralNetwork(INPUT_NODES, HIDDEN_NODES, OUTPUT_NODES, 0.1);
-//    n.deserialize("/Users/bundit/code/neural-net/neural-net/serializable/784x100x10-0.1x4.txt");
-//    trainNetwork(TRAIN_DATA);
-//    n.serialize("/Users/bundit/code/neural-net/neural-net/serializable/784x100x10-0.1x5.txt");
-//    testNetwork(TEST_DATA);
+    do {
+        cout << "Enter 'n' to construct a new neural network or 'l' to load an existing model" << endl;
+        cin.clear();
+        cin >> input;
+        
+    } while (input != 'n' && input != 'l');
     
-//    cout << endl << "Testing 0.2x4" << endl;
-//    n = NeuralNetwork(INPUT_NODES, HIDDEN_NODES, OUTPUT_NODES, 0.2);
-//    n.deserialize("/Users/bundit/code/neural-net/neural-net/serializable/784x100x10-0.2x4.txt");
-//    testNetwork(TEST_DATA);
-//
-//    cout << endl << "Testing 0.3x4" << endl;
-//    n = NeuralNetwork(INPUT_NODES, HIDDEN_NODES, OUTPUT_NODES, 0.3);
-//    n.deserialize("/Users/bundit/code/neural-net/neural-net/serializable/784x100x10-0.3x4.txt");
-//    testNetwork(TEST_DATA);
+    string files[20];
+    string line;
+    int nodes = 0;
+    double lRate = 0.3;
+    if (input == 'n') {
+        do {
+            cout << "Enter a number of hidden nodes for the neural network." << endl;
+            cin >> line;
+            nodes = stoi(line);
+            cout << "Enter a learning rate for the neural network. (A number between 0.01 and 0.3)" << endl;
+            cin >> line;
+            lRate = stod(line);
+        } while (!nodes && !lRate);
+        
+        cout << "Initializing neural network with: " << endl << INPUT_NODES << " input nodes, " << endl;
+        cout << nodes << " hidden layer nodes, " << endl;
+        cout << OUTPUT_NODES << " output nodes, and " << endl;
+        cout << lRate << " learning rate..." << endl;
+        
+        n = NeuralNetwork(INPUT_NODES, nodes, OUTPUT_NODES, lRate);
+    } else if (input == 'l') {
+        DIR *dir;
+        struct dirent *ent;
+        int count = 0;
+        if ((dir = opendir (SERIALIZED_FOLDER.c_str())) != NULL) { //open this directory
+            /* print all the files and directories within directory */
+            while ((ent = readdir (dir)) != NULL) {
+                if (ent->d_name[0] != '.') {
+                    if (count < 10) cout << " ";
+                    cout << count << " | " << ent->d_name << endl;
+                    files[count] = ent->d_name;
+                    count++;
+                }
+            }
+            closedir (dir);
+        } else {
+            /* could not open directory */
+            perror ("");
+            return EXIT_FAILURE;
+        }
+        
+        int fileNumber = 0;
+        
+        do {
+            cout << "Choose a model indicated by their number. EX: 3" << endl;
+            cin >> line;
+            fileNumber = stoi(line);
+        } while (!fileNumber);
+        cout << "Loading model from file " << files[fileNumber] << endl;
+        n.deserialize(SERIALIZED_FOLDER + files[fileNumber]);
+    }
+    
+    do {
+        cout << "Enter 'f' to train the network or 't' to test the network or 'q' to quit" << endl;
+        cin >> input;
+        if (input == 'f') {
+            trainNetwork(TRAIN_DATA);
+        } else if (input == 't') {
+            testNetwork(TEST_DATA);
+        }
+        
+    } while (input != 'q');
+    
 
     return 0;
 }
