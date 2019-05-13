@@ -147,6 +147,10 @@ void NeuralNetwork::serialize(std::string file) {
         cout << "Error opening file " << file << endl;
     }
     
+    fout << this->lRate << endl;
+    // Print one empty line in between
+    fout << endl;
+    
     // Print input-hidden weight matrix first
     for (size_t i = 0; i < i2h.size(); i++) {
         for (size_t j = 0; j < i2h[0].size(); j++) {
@@ -175,6 +179,7 @@ void NeuralNetwork::serialize(std::string file) {
 void NeuralNetwork::deserialize(std::string file) {
     using namespace std;
     
+    double learningRate = 0.3; // Default
     Matrix<double> i2h;
     Matrix<double> h2o;
     
@@ -184,6 +189,14 @@ void NeuralNetwork::deserialize(std::string file) {
     if (!fin.is_open()) {
         cout << "Error opening file " << file << endl;
     }
+    
+    // First get the learning rate
+    while (getline(fin, line)) {
+        if (line.length() == 0) break;
+//        getline(fin, line);
+        learningRate = stod(line);
+    }
+    
     int row = 0;
     while (getline(fin, line)) {
         if (line.length() == 0) break;
@@ -210,6 +223,8 @@ void NeuralNetwork::deserialize(std::string file) {
     }
     fin.close();
     
+    // Set the instance variables
+    this->lRate = learningRate;
     this->inputToHidden.setWeights(i2h);
     this->hiddenToOutput.setWeights(h2o);
 }
