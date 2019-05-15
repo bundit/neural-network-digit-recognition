@@ -21,7 +21,7 @@
 std::string TRAIN_DATA = "../data/mnist/mnist_train.csv"; //Training data set
 std::string TEST_DATA = "../data/mnist/mnist_test.csv";   //Testing data set
 
-// Serialized folder
+// Path to serialized folder
 std::string SERIALIZED_FOLDER = "../data/serializable/";
 
 // Neural Network parameters
@@ -41,10 +41,11 @@ void trainNetwork(std::string data);
 void testNetwork(std::string data);
 void printResults(int count, int total);
 void displayProgress(int current, int total);
+std::string* getFilesInDirectory(std::string directory);
 
 NeuralNetwork n;
 
-int main (int argc, const char * argv[]) {
+int main(int argc, const char * argv[]) {
     using namespace std;
     
     cout << endl << "Starting Convolutional Neural Network Program..." << endl;
@@ -57,7 +58,7 @@ int main (int argc, const char * argv[]) {
         
     } while (input != 'n' && input != 'l');
     
-    string files[20];
+    string* files;//[20];
     string line;
     int nodes = 0;
     double lRate = 0.3;
@@ -78,25 +79,8 @@ int main (int argc, const char * argv[]) {
         
         n = NeuralNetwork(INPUT_NODES, nodes, OUTPUT_NODES, lRate);
     } else if (input == 'l') {
-        DIR *dir;
-        struct dirent *ent;
-        int count = 0;
-        if ((dir = opendir (SERIALIZED_FOLDER.c_str())) != NULL) { //open this directory
-            /* print all the files and directories within directory */
-            while ((ent = readdir (dir)) != NULL) {
-                if (ent->d_name[0] != '.') {
-                    if (count < 10) cout << " ";
-                    cout << count << " | " << ent->d_name << endl;
-                    files[count] = ent->d_name;
-                    count++;
-                }
-            }
-            closedir (dir);
-        } else {
-            /* could not open directory */
-            perror ("");
-            return EXIT_FAILURE;
-        }
+        
+        files = getFilesInDirectory(SERIALIZED_FOLDER);
         
         int fileNumber = 0;
         
@@ -196,7 +180,7 @@ void testNetwork(std::string data) {
     printResults(correct, testCount);
 }
 
-//print the results given the count and total amount of inputs
+// Print the results given the count and total amount of inputs
 void printResults(int count, int total) {
     using namespace std;
 	cout << "Total of " << total << " inputs tested." << endl;
@@ -204,8 +188,36 @@ void printResults(int count, int total) {
 	cout << (double)count / total * 100 << "% accuracy." << endl;
 }
 
+// Display the progress of a training set or a testing set
 void displayProgress(int current, int total) {
     int percent = (double) current / total * 100.0;
     std::cout << current << " of " << total << " completed | " << percent << "%\r";
     std::cout.flush();
+}
+
+// Get the files in a directory and return the files in an array of strings
+std::string* getFilesInDirectory(std::string directory) {
+    using namespace std;
+    std::string* files = new std::string[20];
+    DIR *dir;
+    struct dirent *ent;
+    int count = 0;
+    if ((dir = opendir (directory.c_str())) != NULL) { //open this directory
+        /* print all the files and directories within directory */
+        while ((ent = readdir (dir)) != NULL) {
+            if (ent->d_name[0] != '.') {
+                if (count < 10) cout << " ";
+                cout << count << " | " << ent->d_name << endl;
+                files[count] = ent->d_name;
+                count++;
+            }
+        }
+        closedir (dir);
+    } else {
+        /* could not open directory */
+        perror ("EXIT_FAILURE");
+        exit(1);
+    }
+    
+    return files;
 }
