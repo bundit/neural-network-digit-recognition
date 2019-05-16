@@ -56,14 +56,15 @@ int main(int argc, const char * argv[]) {
         cout << "Enter 'n' to construct a new neural network or 'l' to load an existing model" << endl;
         cin.clear();
         cin >> input;
-        
     } while (input != 'n' && input != 'l');
     
-    string* files;//[20];
+    string* files;
     string line;
+    
     if (input == 'n') {
         initNewNeuralNet();
-    } else if (input == 'l') {
+    }
+    else if (input == 'l') {
         
         files = getFilesInDirectory(SERIALIZED_FOLDER);
         
@@ -192,7 +193,7 @@ std::string* getFilesInDirectory(std::string directory) {
     if ((dir = opendir (directory.c_str())) != NULL) { //open this directory
         /* print all the files and directories within directory */
         while ((ent = readdir (dir)) != NULL) {
-            if (ent->d_name[0] != '.') {
+            if (ent->d_name[0] != '.' && strncmp(ent->d_name, "README", 6)) {
                 if (count < 10) cout << " ";
                 cout << count << " | " << ent->d_name << endl;
                 files[count] = ent->d_name;
@@ -217,13 +218,13 @@ void initNewNeuralNet() {
     string line; // cin buffer
     
     do {
-        cout << "Enter a number of hidden nodes for the neural network." << endl;
+        cout << "Enter a number of hidden nodes for the neural network greater than 0." << endl;
         cin >> line;
         nodes = stoi(line);
         cout << "Enter a learning rate for the neural network. (A number between 0.01 and 0.3 is recommended)" << endl;
         cin >> line;
         lRate = stod(line);
-    } while (!nodes && !lRate);
+    } while (nodes == 0 && !lRate);
     
     cout << "Initializing neural network with: " << endl << INPUT_NODES << " input nodes, " << endl;
     cout << nodes << " hidden layer nodes, " << endl;
