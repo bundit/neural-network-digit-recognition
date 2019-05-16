@@ -42,9 +42,10 @@ void trainNetwork(std::string data);
 void testNetwork(std::string data);
 void printResults(int count, int total);
 void displayProgress(int current, int total);
-std::string* getFilesInDirectory(std::string directory);
+std::string* getFilesInDirectory(std::string* files, std::string directory);
 void initNewNeuralNet();
 void displayFiles(std::string* fileList);
+void pickFileToLoadFrom(std::string* fileList);
 
 NeuralNetwork n;
 
@@ -60,28 +61,18 @@ int main(int argc, const char * argv[]) {
         cin >> input;
     } while (input != 'n' && input != 'l');
     
-    string* files;
-    string line;
+    std::string* files = new std::string[MAX_NUM_FILES];
     
     if (input == 'n') {
         initNewNeuralNet();
     }
     else if (input == 'l') {
-        
-        files = getFilesInDirectory(SERIALIZED_FOLDER);
+        files = getFilesInDirectory(files, SERIALIZED_FOLDER);
         displayFiles(files);
-        int fileNumber = 0;
-        
-        do {
-            cout << "Choose a model indicated by their number. EX: 3" << endl;
-            cin >> line;
-            fileNumber = stoi(line);
-        } while (!fileNumber);
-        cout << "Loading model from file " << files[fileNumber] << endl;
-        n.deserialize(SERIALIZED_FOLDER + files[fileNumber]);
-        
-        delete files; // de allocate mem
+        pickFileToLoadFrom(files);
     }
+    
+    delete[] files; // deallocate files
     
     do {
         cout << "Enter 'f' to train the network or 't' to test the network or 'q' to quit" << endl;
@@ -187,9 +178,10 @@ void displayProgress(int current, int total) {
 
 // Get the files in a directory and return the files in an array of strings
 // Also prints the list of files to the console
-std::string* getFilesInDirectory(std::string directory) {
+std::string* getFilesInDirectory(std::string* files, std::string directory) {
     using namespace std;
-    std::string* files = new std::string[MAX_NUM_FILES];
+//    std::string* files = new std::string[MAX_NUM_FILES];
+//    std::string files[MAX_NUM_FILES];
     DIR *dir; //directory
     struct dirent *ent;
     int count = 0;
@@ -223,6 +215,22 @@ void displayFiles(std::string* fileList) {
         cout << i << " | " << fileList[i] << endl;
         i++;
     }
+}
+
+// Prompt for a file selection and load the file to neural net
+void pickFileToLoadFrom(std::string* fileList) {
+    using namespace std;
+    
+    string line; //buffer
+    int fileNumber = 0;
+    
+    do {
+        cout << "Choose a model indicated by their number. EX: 3" << endl;
+        cin >> line;
+        fileNumber = stoi(line);
+    } while (!fileNumber);
+    cout << "Loading model from file " << fileList[fileNumber] << endl;
+    n.deserialize(SERIALIZED_FOLDER + fileList[fileNumber]);
 }
 
 // Init new neural net by user input
