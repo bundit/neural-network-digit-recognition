@@ -26,9 +26,7 @@ std::string SERIALIZED_FOLDER = "../data/serializable/";
 
 // Neural Network parameters
 int INPUT_NODES = 28 * 28;  // For grayscale images of length 28 and width 28 pixels
-//int HIDDEN_NODES = 100;     // Arbitrary number, usually a number between OUTPUT_NODES and INPUT_NODES is recommended
 int OUTPUT_NODES = 10;      // For digit recognition, 0-9 represents 10 different outputs possible
-//double LEARNING_RATE = .2;  // Ratio used to prevent 'overstepping' in our weight adjustments
 
 // Training and testing parameters
 // Set these to INT_MAX to train or test the whole set,
@@ -38,35 +36,37 @@ int TESTING_COUNT = 10000;
 int MAX_NUM_FILES = 30;
 
 // Testing function declarations
-void trainNetwork(std::string data);
-void testNetwork(std::string data);
-void printResults(int count, int total);
-void displayProgress(int current, int total);
-std::string* getFilesInDirectory(std::string* files, std::string directory);
-void initNewNeuralNet();
-void displayFiles(std::string* fileList);
-void pickFileToLoadFrom(std::string* fileList);
+void trainNetwork(std::string data);     //Train the network with the data input
+void testNetwork(std::string data);      //Test the network with the data input
+void printResults(int count, int total); //Print results after training or testing
+void displayProgress(int current, int total); //Displays the progress during a training or testing
+std::string* getFilesInDirectory(std::string* files, std::string directory); //Retrieve a list of files you can load from
+void initNewNeuralNet();                 //User prompted new neural network initialization
+void displayFiles(std::string* fileList);//Display files to user to choose from
+void pickFileToLoadFrom(std::string* fileList); //Let the user choose a file
 
 NeuralNetwork n;
 
 int main(int argc, const char * argv[]) {
     using namespace std;
-    
+    // Start the program
     cout << endl << "Starting Convolutional Neural Network Program..." << endl;
-    char input;
     
+    // User can make a new neural net or load an existing model
+    char input;
     do {
         cout << "Enter 'n' to construct a new neural network or 'l' to load an existing model" << endl;
         cin.clear();
         cin >> input;
     } while (input != 'n' && input != 'l');
     
+    // File list buffer
     std::string* files = new std::string[MAX_NUM_FILES];
     
-    if (input == 'n') {
+    if (input == 'n') { // new net
         initNewNeuralNet();
     }
-    else if (input == 'l') {
+    else if (input == 'l') { // load net
         files = getFilesInDirectory(files, SERIALIZED_FOLDER);
         displayFiles(files);
         pickFileToLoadFrom(files);
@@ -74,7 +74,7 @@ int main(int argc, const char * argv[]) {
     
     delete[] files; // deallocate files
     
-    do {
+    do { //training or testing
         cout << "Enter 'f' to train the network or 't' to test the network or 'q' to quit" << endl;
         cin >> input;
         if (input == 'f') {
@@ -180,22 +180,18 @@ void displayProgress(int current, int total) {
 // Also prints the list of files to the console
 std::string* getFilesInDirectory(std::string* files, std::string directory) {
     using namespace std;
-//    std::string* files = new std::string[MAX_NUM_FILES];
-//    std::string files[MAX_NUM_FILES];
     DIR *dir; //directory
     struct dirent *ent;
     int count = 0;
     if ((dir = opendir (directory.c_str())) != NULL) { //open this directory
-        /* print all the files and directories within directory */
-        while ((ent = readdir (dir)) != NULL) {
-            if (ent->d_name[0] != '.' && strncmp(ent->d_name, "README", 6)) {
+        while ((ent = readdir (dir)) != NULL) { //If null, end
+            if (ent->d_name[0] != '.' && strncmp(ent->d_name, "README", 6)) { // ignore irrelevant files
                 files[count] = ent->d_name;
                 count++;
             }
         }
-        closedir (dir);
-    } else {
-        /* could not open directory */
+        closedir (dir); //close directory
+    } else { //could not open directory
         perror ("EXIT_FAILURE");
         exit(1);
     }
