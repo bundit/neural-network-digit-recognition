@@ -91,6 +91,8 @@ int main(int argc, const char * argv[]) {
         } while (!fileNumber);
         cout << "Loading model from file " << files[fileNumber] << endl;
         n.deserialize(SERIALIZED_FOLDER + files[fileNumber]);
+        
+        delete files; // de allocate mem
     }
     
     do {
@@ -199,7 +201,7 @@ void displayProgress(int current, int total) {
 std::string* getFilesInDirectory(std::string directory) {
     using namespace std;
     std::string* files = new std::string[20];
-    DIR *dir;
+    DIR *dir; //directory
     struct dirent *ent;
     int count = 0;
     if ((dir = opendir (directory.c_str())) != NULL) { //open this directory
