@@ -35,6 +35,7 @@ int OUTPUT_NODES = 10;      // For digit recognition, 0-9 represents 10 differen
 // otherwise set to a smaller number to train or test only a specific amount
 int TRAINING_COUNT = 60000;
 int TESTING_COUNT = 10000;
+int MAX_NUM_FILES = 30;
 
 // Testing function declarations
 void trainNetwork(std::string data);
@@ -43,6 +44,7 @@ void printResults(int count, int total);
 void displayProgress(int current, int total);
 std::string* getFilesInDirectory(std::string directory);
 void initNewNeuralNet();
+void displayFiles(std::string* fileList);
 
 NeuralNetwork n;
 
@@ -67,7 +69,7 @@ int main(int argc, const char * argv[]) {
     else if (input == 'l') {
         
         files = getFilesInDirectory(SERIALIZED_FOLDER);
-        
+        displayFiles(files);
         int fileNumber = 0;
         
         do {
@@ -184,9 +186,10 @@ void displayProgress(int current, int total) {
 }
 
 // Get the files in a directory and return the files in an array of strings
+// Also prints the list of files to the console
 std::string* getFilesInDirectory(std::string directory) {
     using namespace std;
-    std::string* files = new std::string[20];
+    std::string* files = new std::string[MAX_NUM_FILES];
     DIR *dir; //directory
     struct dirent *ent;
     int count = 0;
@@ -194,8 +197,6 @@ std::string* getFilesInDirectory(std::string directory) {
         /* print all the files and directories within directory */
         while ((ent = readdir (dir)) != NULL) {
             if (ent->d_name[0] != '.' && strncmp(ent->d_name, "README", 6)) {
-                if (count < 10) cout << " ";
-                cout << count << " | " << ent->d_name << endl;
                 files[count] = ent->d_name;
                 count++;
             }
@@ -208,6 +209,20 @@ std::string* getFilesInDirectory(std::string directory) {
     }
     
     return files;
+}
+
+// Print the files to console from the fileList
+void displayFiles(std::string* fileList) {
+    using namespace std;
+    cout << endl;
+    
+    int i = 0;
+    while (fileList[i].length() != 0 && i < MAX_NUM_FILES) {
+        if (i < 10)
+            cout << " ";
+        cout << i << " | " << fileList[i] << endl;
+        i++;
+    }
 }
 
 // Init new neural net by user input
