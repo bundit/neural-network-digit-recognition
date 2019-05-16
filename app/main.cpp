@@ -42,6 +42,7 @@ void testNetwork(std::string data);
 void printResults(int count, int total);
 void displayProgress(int current, int total);
 std::string* getFilesInDirectory(std::string directory);
+void initNewNeuralNet();
 
 NeuralNetwork n;
 
@@ -60,24 +61,8 @@ int main(int argc, const char * argv[]) {
     
     string* files;//[20];
     string line;
-    int nodes = 0;
-    double lRate = 0.3;
     if (input == 'n') {
-        do {
-            cout << "Enter a number of hidden nodes for the neural network." << endl;
-            cin >> line;
-            nodes = stoi(line);
-            cout << "Enter a learning rate for the neural network. (A number between 0.01 and 0.3)" << endl;
-            cin >> line;
-            lRate = stod(line);
-        } while (!nodes && !lRate);
-        
-        cout << "Initializing neural network with: " << endl << INPUT_NODES << " input nodes, " << endl;
-        cout << nodes << " hidden layer nodes, " << endl;
-        cout << OUTPUT_NODES << " output nodes, and " << endl;
-        cout << lRate << " learning rate..." << endl;
-        
-        n = NeuralNetwork(INPUT_NODES, nodes, OUTPUT_NODES, lRate);
+        initNewNeuralNet();
     } else if (input == 'l') {
         
         files = getFilesInDirectory(SERIALIZED_FOLDER);
@@ -222,4 +207,28 @@ std::string* getFilesInDirectory(std::string directory) {
     }
     
     return files;
+}
+
+// Init new neural net by user input
+void initNewNeuralNet() {
+    using namespace std;
+    double lRate = 0.3; // default learning rate
+    int nodes = 0; // number of hidden nodes
+    string line; // cin buffer
+    
+    do {
+        cout << "Enter a number of hidden nodes for the neural network." << endl;
+        cin >> line;
+        nodes = stoi(line);
+        cout << "Enter a learning rate for the neural network. (A number between 0.01 and 0.3 is recommended)" << endl;
+        cin >> line;
+        lRate = stod(line);
+    } while (!nodes && !lRate);
+    
+    cout << "Initializing neural network with: " << endl << INPUT_NODES << " input nodes, " << endl;
+    cout << nodes << " hidden layer nodes, " << endl;
+    cout << OUTPUT_NODES << " output nodes, and " << endl;
+    cout << lRate << " learning rate..." << endl;
+    
+    n = NeuralNetwork(INPUT_NODES, nodes, OUTPUT_NODES, lRate);
 }
