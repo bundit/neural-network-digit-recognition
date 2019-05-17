@@ -1,7 +1,36 @@
+![Image of neural network](https://raw.githubusercontent.com/bundit/Neural-Network-Digit-Recognition/master/images/NeuralNet.png)
 # Convolution Neural Network Implementation in Vanilla C++
 
 This is a repository for a neural network implementation built from the ground up with pure C++ and no external libraries. 
-___
+___ 
+## Neural Networks
+
+### What are they and how do they work?
+Neural networks are networks that are a simplified model of connections in the human brain. They are designed to recognize patterns and "learn" from them.
+<br><br>
+On a basic level, we can look at a neural network and simply view them as a black box that takes some input, performs some calculations or "thinking" and produce some output. Given some output and knowing what we expect the output should be, we can calculate errors and have the neural network "learn" from it, so that next time it will be more accurate in its output. We call this iterative learning because we repeatedly train the neural network one step at a time.
+
+### About this Neural Network
+This part references the image above. <br>
+* The brown lines represent input signals coming into the neural network. In this project we initialize this number to be 784 to represent a 28 by 28 pixel grayscale image. 
+* The green circles represent the input layer nodes to the network. The number of nodes needs to be equivalent to the number of input signals, 784.
+* The blue circles represent the hidden layer nodes in the network. We use a hidden layer between the input and output layer to allow the network to reduce generalization and process more details. Typically, a more complex problem may require more than one hidden layer.
+* The red circles represent our output layer nodes. The number of nodes will depend on what type of output you are expecting from the neural network. In our case we want to recognize digits 0-9 so we use 10 output nodes. 
+* The yellow lines represent connections with weights associated with them connecting the input nodes to the hidden nodes. They allow us to calculate the signals going into the hidden layer.
+* The pink lines represent connections with weights connecting the hidden nodes to the output nodes. Similar to the input to hidden connections, we use them to calculate the next layer of signals to output. They are calculated in the same fashion. 
+* The black line represents the actual output of the neural network. There is one output associated with each output node, so 10 output signals.
+
+### More about neural networks
+
+You can learn more about neural networks [here](https://en.wikipedia.org/wiki/Convolutional_neural_network). 
+
+## Dataset
+This project utilized the [MNIST handwritten digit database](http://yann.lecun.com/exdb/mnist/). These are grayscale images of size 28 pixels by 28 pixels with a label of what number they represent.
+* The training set contains 60,000 images
+* The testing set contains 10,000 images
+
+# Run This Project
+
 ## Requirements
 To run this on your local machine you will need the following installed:
 * CMake (Version 2.8+)
@@ -69,5 +98,6 @@ Run the program
 $ ./neural-net-app
 ```
 
-## Reflection
-...to be done...
+# Future Ideas
+* Add canvas to draw your own digits to be tested
+* Train the neural network on an alphabet dataset to recognize letters 
