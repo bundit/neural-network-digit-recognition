@@ -75,11 +75,11 @@ Lastly, install CMake with the installer from [this page](https://cmake.org/down
 ## Project Installation and Setup
 Clone the repository
 ```
-$ git clone https://github.com/bunditHongmanee/Neural-Network-Digit-Recognition-.git
+$ git clone https://github.com/bundit/neural-network-digit-recognition.git
 ```
 Navigate to the project directory
 ```
-$ cd Neural-Network-Digit-Recognition
+$ cd neural-network-digit-recognition
 ```
 Run CMake. H targets the source directory "." which is our current directory and B targets where to output the build files. This will create a folder called "_build" and create the build files there
 ```
